@@ -1,10 +1,6 @@
 package ch.exgBot;
 
-import java.util.Timer;
-import java.util.TimerTask;
-
 import me.philippheuer.twitch4j.TwitchClient;
-import me.philippheuer.twitch4j.TwitchClientBuilder;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
@@ -14,6 +10,8 @@ public class Main {
 	private static JDA jda;
 	
 	private static TwitchClient twitchclient;
+	
+	private static String[] args;
 	
 	public static void main(String[] args) {
 		try {
@@ -26,19 +24,10 @@ public class Main {
 			return;
 		}
 		
+		setArgs(args);
+		
 		jda.addEventListener(new EventListener());
 		
-		twitchclient = TwitchClientBuilder.init()
-				.withClientId(args[1])
-				.withClientSecret(args[2])
-				.withCredential(args[3])
-				.connect();
-		
-		StreamChecker.setWasOnline(false);
-		
-		Timer timer = new Timer();
-		TimerTask task = new StreamChecker();
-		timer.schedule(task, 0, 60000);
 	}
 	
 
@@ -49,6 +38,21 @@ public class Main {
 
 	public static TwitchClient getTwitchclient() {
 		return twitchclient;
+	}
+
+
+	public static void setTwitchclient(TwitchClient twitchclient) {
+		Main.twitchclient = twitchclient;
+	}
+
+
+	public static String[] getArgs() {
+		return args;
+	}
+
+
+	public static void setArgs(String[] args) {
+		Main.args = args;
 	}
 
 }

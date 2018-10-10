@@ -11,13 +11,14 @@ import net.dv8tion.jda.core.entities.MessageEmbed.Field;
 
 public class MessageBuilder {
 	
+	private static long inc = 1;
+	
 	public static MessageEmbed createInfoStreamMessage(Channel channel, StreamEndpoint stream) {
     	Stream actualStream = stream.getByChannel(channel);
 		
 		EmbedBuilder message = new EmbedBuilder();
 		message.setAuthor(channel.getDisplayName(), null, channel.getLogo());
 		message.setTitle(channel.getStatus(), "https://www.twitch.tv/terrasomnia");
-		message.setImage(actualStream.getPreview().getMedium());
 		
 		Field field = new Field("Jeu", channel.getGame(), true);
 		message.addField(field);
@@ -27,7 +28,13 @@ public class MessageBuilder {
 		
 		message.setThumbnail(channel.getLogo());
 		
+		message.setImage(actualStream.getPreview().getLarge() + "/?%20=" + inc);
+		inc++;
+		
 		message.setColor(Color.GREEN);
+		
+		System.out.println("Message numéro " + inc + "crée");
+		
 		return message.build();
 	}
 

@@ -1,7 +1,10 @@
 package ch.exgBot;
 
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
+import me.philippheuer.twitch4j.TwitchClientBuilder;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Role;
@@ -20,6 +23,19 @@ public class EventListener extends ListenerAdapter{
 	
 	@Override
 	public void onReady(ReadyEvent event) {
+		
+		Main.setTwitchclient(TwitchClientBuilder.init()
+				.withClientId(Main.getArgs()[1])
+				.withClientSecret(Main.getArgs()[2])
+				.withCredential(Main.getArgs()[3])
+				.connect());
+		
+		StreamChecker.setWasOnline(false);
+		
+		Timer timer = new Timer();
+		TimerTask task = new StreamChecker();
+		timer.schedule(task, 0, 60000);
+		
 		StreamChecker.setAnnonceChannel(Main.getJda().getGuildById(EventListener.getIdStreamGuild()).getTextChannelById(ANNONCE_ID_CHANNEL));
 		Main.getJda().getTextChannelsByName("feedback-bot", true).get(0).sendMessage("Je suis Up !").complete();
 	}
