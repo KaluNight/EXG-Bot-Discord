@@ -11,7 +11,7 @@ import net.dv8tion.jda.core.entities.MessageEmbed.Field;
 
 public class MessageBuilder {
 	
-	private static long inc = 1;
+	private static final String LINK_BANNER = "https://static-cdn.jtvnw.net/jtv_user_pictures/b93e4a34-4b7d-40bb-8ff4-74557d31542d-profile_banner-480.png";
 	
 	public static MessageEmbed createInfoStreamMessage(Channel channel, StreamEndpoint stream) {
     	Stream actualStream = stream.getByChannel(channel);
@@ -28,12 +28,16 @@ public class MessageBuilder {
 		
 		message.setThumbnail(channel.getLogo());
 		
-		message.setImage(actualStream.getPreview().getLarge() + "/?%20=" + inc);
+		long inc = SaveSystem.loadActualNumberOfInc();
+		
+		message.setImage(LINK_BANNER);
+		
+		System.out.println("Message numéro " + inc + " crée, Nom du live : " + channel.getDisplayName());
 		inc++;
 		
-		message.setColor(Color.GREEN);
+		SaveSystem.saveActualNumberOfInc(inc);
 		
-		System.out.println("Message numéro " + inc + "crée");
+		message.setColor(Color.GREEN);
 		
 		return message.build();
 	}

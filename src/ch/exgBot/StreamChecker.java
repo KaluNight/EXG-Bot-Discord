@@ -5,6 +5,7 @@ import java.util.Random;
 import java.util.TimerTask;
 
 import ch.exgBot.utility.MessageBuilder;
+import me.philippheuer.twitch4j.endpoints.ChannelEndpoint;
 import me.philippheuer.twitch4j.endpoints.StreamEndpoint;
 import me.philippheuer.twitch4j.model.Channel;
 import net.dv8tion.jda.core.entities.Game;
@@ -15,6 +16,10 @@ import net.dv8tion.jda.core.entities.TextChannel;
 public class StreamChecker extends TimerTask {
 
 	private static final Random random = new Random();
+	
+	private static ChannelEndpoint channelEndpoint;
+	
+	private static StreamEndpoint streamEndpoint;
 
 	private static boolean wasOnline;
 
@@ -23,28 +28,27 @@ public class StreamChecker extends TimerTask {
 	private static Message embendedMessage;
 
 	private static final String[] LIST_QUOTE_IN_LIVE_WATCH = {"KaluNight jouer avec moi", "Aristo faire des blagues", "Enollia entrain de chanter",
-			"Sylveøn joué à Pokémon", "Panda créer des dictatures"};
+			"Sylveøn joué à Pokémon", "Panda créer des dictatures", "Konrad faire du SpeedRun"};
 
-	private static final String[] LIST_QUOTE_IN_LIVE_PLAY = {"avec le micro de Daxyys", "à conduire le vaisseau avec Ozuki"};
+	private static final String[] LIST_QUOTE_IN_LIVE_PLAY = {"avec le micro de Daxyys", "conduire le vaisseau avec Ozuki", "dancer avec Typraah"};
 	
 	private static final String[] LIST_QUOTE_NOT_IN_LIVE_WATCH = {"des galaxies", "une civilisation déchu", "des grenouilles sur un lac",
 			"Ezreal en cachette"};
 			
-	private static final String[] LIST_QUOTE_NOT_IN_LIVE_PLAY = {"à one-shot un adc", "à flash 6 fois de suite", "à endormir un jungler égaré",
+	private static final String[] LIST_QUOTE_NOT_IN_LIVE_PLAY = {"one-shot un adc", "flash 6 fois de suite", "endormir un jungler égaré",
 			"courir derrière des papillons", "chasser Lux"};
 
 	@Override
 	public void run() {
-		Channel channel = Main.getTwitchclient().getChannelEndpoint().getChannel("Terrasomnia");
-		StreamEndpoint stream = Main.getTwitchclient().getStreamEndpoint();
+		Channel channel = channelEndpoint.getChannel("Terrasomnia");
 		
-		boolean streamIsLive = stream.isLive(channel);
+		boolean streamIsLive = streamEndpoint.isLive(channel);
 
 		if(streamIsLive && !wasOnline) {
 			wasOnline = true;
 
 			annonce_channel.sendMessage("Hey @everyone ! Nous sommes actuellement en live ! Venez donc nous dire coucou !").queue();
-			embendedMessage = annonce_channel.sendMessage(MessageBuilder.createInfoStreamMessage(channel, stream)).complete();
+			embendedMessage = annonce_channel.sendMessage(MessageBuilder.createInfoStreamMessage(channel, streamEndpoint)).complete();
 		} else if (!streamIsLive && wasOnline) {
 			wasOnline = false;
 			embendedMessage = null;
@@ -54,7 +58,7 @@ public class StreamChecker extends TimerTask {
 			ArrayList<Object> list = getRandomGameTypeAndQuotesInLive();
 			Main.getJda().getPresence().setGame(Game.of((GameType)list.get(0), (String)list.get(1)));
 			
-			embendedMessage.editMessage(MessageBuilder.createInfoStreamMessage(channel, stream)).queue();
+			embendedMessage.editMessage(MessageBuilder.createInfoStreamMessage(channel, streamEndpoint)).queue();
 		}else {
 			ArrayList<Object> list = getRandomGameTypeAndQuotesNotInLive();
 			Main.getJda().getPresence().setGame(Game.of((GameType)list.get(0), (String)list.get(1)));
@@ -113,5 +117,21 @@ public class StreamChecker extends TimerTask {
 
 	public static void setAnnonceChannel(TextChannel pannonce_channel) {
 		annonce_channel = pannonce_channel;
+	}
+
+	public static ChannelEndpoint getChannelEndpoint() {
+		return channelEndpoint;
+	}
+
+	public static void setChannelEndpoint(ChannelEndpoint channelEndpoint) {
+		StreamChecker.channelEndpoint = channelEndpoint;
+	}
+
+	public static StreamEndpoint getStreamEndpoint() {
+		return streamEndpoint;
+	}
+
+	public static void setStreamEndpoint(StreamEndpoint streamEndpoint) {
+		StreamChecker.streamEndpoint = streamEndpoint;
 	}
 }
